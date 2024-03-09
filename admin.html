@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>label{display: inline-block;width: 80px;}
+    input,select{width: 120px;}</style>
+    <title>admin interface</title>
+</head>
+<body>
+    <label>Title</label><input id="Namebox" type="text"><br><br>
+    <label>Author</label><input id="Authorbox" type="text"><br><br>
+    <label>Price</label><input id="Pricebox" type="text"><br><br>
+    <label>Name</label>
+    <select id="Category">
+        <option value="story">story</option>
+        <option value="novel">novel</option>
+    </select>
+    <hr>
+    <button id="insbtn">INSERT</button>
+    <button id="selbtn">SELECT</button>
+    <button id="upbtn">UPDATE</button>
+    <button id="delbtn">DELETE</button>
+
+    <!--------import and config-->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBbGYWVv4s1enraDtocRXli9-9OSx9Yhzs",
+          authDomain: "firestore-sample-2590c.firebaseapp.com",
+          projectId: "firestore-sample-2590c",
+          storageBucket: "firestore-sample-2590c.appspot.com",
+          messagingSenderId: "697448043130",
+          appId: "1:697448043130:web:6cd2bfb3312e9bdde461c3"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+      
+
+    import {getFirestore,doc,getDoc,setDoc,collection,addDoc,updateDoc,deleteDoc,deleteField} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const db = getFirestore();
+
+    // references//
+
+    let NameBox = document.getElementById("Namebox");
+    let authorbox = document.getElementById("Authorbox");
+    let pricebox = document.getElementById("Pricebox");
+    let category = document.getElementById("Category");
+
+    let insbtn = document.getElementById("insbtn");
+    let selbtn = document.getElementById("selbtn");
+    let upbtn = document.getElementById("upbtn");
+    let delbtn = document.getElementById("delbtn");
+
+    // adding documents //
+
+    async function AddDocument_AutoID(){
+        var ref = collection(db,"TheBooklist");
+
+        const docref = await addDoc(
+            ref , {
+                Title:NameBox.value,
+                author:authorbox.value,
+                price:pricebox.value,
+                categ:category.value
+            }
+        )
+        .then(()=>{
+                alert("data stored succesfully");
+            })
+            .catch((error)=>{
+                alert("unsuccessful , error"+ error);
+            });
+    }
+
+    // custom id //
+    async function AddDocument_CustomID(){
+        var ref = doc(db,"TheBooklist",authorbox.value);
+
+        const docref = await setDoc(
+            ref , {
+                Title:NameBox.value,
+                author:authorbox.value,
+                price:pricebox.value,
+                categ:category.value
+            }
+        )
+        .then(()=>{
+                alert("data stored succesfully");
+            })
+            .catch((error)=>{
+                alert("unsuccessful , error"+ error);
+            });
+    }
+
+    // get document //
+
+async function GetADocument(){
+    var ref = doc(db,"TheBooklist",authorbox.value);
+    const docSnap = await getDoc(ref);
+
+    if(docSnap.exists()){
+            NameBox.value = docSnap.data().Title;
+            pricebox.value = docSnap.data().price;
+            category.value = docSnap.data().categ; 
+        }
+
+        else{
+            alert("no data found");
+        }
+}
+
+// update /// 
+
+async function UpdateFieldInADocument(){
+        var ref = doc(db,"TheBooklist",authorbox.value);
+
+        await updateDoc(
+            ref , {
+                Title:NameBox.value,
+                price:pricebox.value,
+                categ:category.value
+            }
+        )
+        .then(()=>{
+                alert("data update succesfully");
+            })
+            .catch((error)=>{
+                alert("unsuccessful , error"+ error);
+            });
+    }
+
+    // delete //
+
+    async function DeleteADocument(){
+        var ref = doc(db,"TheBooklist",authorbox.value);
+    const docSnap = await getDoc(ref);
+
+    if(!docSnap.exists()){
+           alert("Document doesnot exist");
+           return; 
+        }
+    await deleteDoc(ref)
+    .then(()=>{
+                alert("data delete succesfully");
+            })
+            .catch((error)=>{
+                alert("unsuccessful , error"+ error);
+            });
+    } 
+
+
+      // assign event to button //
+      insbtn.addEventListener('click', AddDocument_CustomID);
+      selbtn.addEventListener('click', GetADocument);
+      upbtn.addEventListener('click', UpdateFieldInADocument);
+      delbtn.addEventListener('click',DeleteADocument);
+      </script>
+</body>
+</html>
